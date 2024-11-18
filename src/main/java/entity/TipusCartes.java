@@ -57,6 +57,14 @@ public class TipusCartes implements Serializable {
         this.color = color;
     }
 
+    public int getIdTipusCartes() {
+        return idTipusCartes;
+    }
+
+    public void setIdTipusCartes(int idTipusCartes) {
+        this.idTipusCartes = idTipusCartes;
+    }
+
     public String getNom() {
         return nom;
     }

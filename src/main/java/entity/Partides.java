@@ -44,6 +44,14 @@ public class Partides implements Serializable {
         this.dataFinalPartida = dataFinal;
     }
 
+    public int getIdPartida() {
+        return idPartida;
+    }
+
+    public void setIdPartida(int idPartida) {
+        this.idPartida = idPartida;
+    }
+
     public LocalDateTime getDataInici() {
         return this.dataIniciPartida;
     }

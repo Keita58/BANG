@@ -58,6 +58,14 @@ public class Jugadors implements Serializable {
         this.posicioJugador = posicio;
     }
 
+    public int getIdJugador() {
+        return idJugador;
+    }
+
+    public void setIdJugador(int idJugador) {
+        this.idJugador = idJugador;
+    }
+
     public String getNom() {
         return nomJugador;
     }

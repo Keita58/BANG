@@ -40,6 +40,14 @@ public class Armes implements Serializable{
         this.descripcioArma = descripcioArma;
         this.distanciaArma = distanciaArma;
     }
+    
+    public int getIdArma() {
+        return idArma;
+    }
+
+    public void setIdArma(int idArma) {
+        this.idArma = idArma;
+    }
 
     public String getNomArma() {
         return nomArma;
@@ -95,5 +103,4 @@ public class Armes implements Serializable{
                 ", distanciaArma=" + distanciaArma +
                 '}';
     }
-
 }

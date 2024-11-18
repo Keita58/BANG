@@ -23,6 +23,9 @@ public class Personatges implements Serializable {
     @Lob()
     private byte[] descripcioPersonatge;
 
+    @Column(name = "Bales", nullable = false)
+    private int bales;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idJugador")
     private Jugadors personatgeAmbJugador;
@@ -31,9 +34,18 @@ public class Personatges implements Serializable {
         super();
     }
 
-    public Personatges(String nom, byte[] descripcio) {
+    public Personatges(String nom, byte[] descripcio, int bales) {
         this.nomPersonatge = nom;
         this.descripcioPersonatge = descripcio;
+        this.bales = bales;
+    }
+
+    public int getIdPersonatge() {
+        return idPersonatge;
+    }
+
+    public void setIdPersonatge(int idPersonatge) {
+        this.idPersonatge = idPersonatge;
     }
 
     public String getNom() {
@@ -50,6 +62,14 @@ public class Personatges implements Serializable {
 
     public void setDescripcio(byte[] descripcio) {
         this.descripcioPersonatge = descripcio;
+    }
+
+    public int getBales() {
+        return bales;
+    }
+
+    public void setBales(int bales) {
+        this.bales = bales;
     }
 
     public Jugadors getPersonatgeAmbJugador() {

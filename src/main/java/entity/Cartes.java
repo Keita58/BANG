@@ -42,6 +42,14 @@ public class Cartes implements Serializable {
         this.numeroCarta = numeroCarta;
     }
 
+    public int getIdCarta() {
+        return idCarta;
+    }
+
+    public void setIdCarta(int idCarta) {
+        this.idCarta = idCarta;
+    }
+
     public Pal getPalCarta() {
         return palCarta;
     }
