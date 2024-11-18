@@ -9,11 +9,11 @@ import java.util.List;
 public class CartaDAO extends GenericDAO<Cartes, Integer> implements ICartaDAO {
 
     public List<Cartes> getCartesSenseJugador(){
-        List<Cartes> cartesList=(List<Cartes>) this.findAll();
-        List<Cartes> cartesListFinal=new ArrayList<>();
+        List<Cartes> cartesList = (List<Cartes>) this.findAll();
+        List<Cartes> cartesListFinal = new ArrayList<>();
         for(Object o : cartesList){
             Cartes c = (Cartes) o;
-            if (c.getCartesjugador()==null)
+            if (c.getCartesJugador() == null)
                 continue;
             cartesListFinal.add(c);
         }
@@ -21,11 +21,11 @@ public class CartaDAO extends GenericDAO<Cartes, Integer> implements ICartaDAO {
     }
 
     public List<Cartes> getCartesBangSenseJugador(){
-        List<Cartes> cartesList=(List<Cartes>) this.findAll();
+        List<Cartes> cartesList = (List<Cartes>) this.findAll();
         List<Cartes> cartesListFinal = new ArrayList<>();
         for(Object o : cartesList){
             Cartes c = (Cartes) o;
-            if (!c.getCartatipusCarta().getNom().equals("Bang") && c.getCartesjugador() != null)
+            if (!c.getCartaTipusCarta().getNom().equals("Bang") && c.getCartesJugador() != null)
                 continue;
             cartesListFinal.add(c);
         }
@@ -37,7 +37,7 @@ public class CartaDAO extends GenericDAO<Cartes, Integer> implements ICartaDAO {
         List<Cartes> cartesListFinal = new ArrayList<>();
         for(Object o : cartesList){
             Cartes c = (Cartes) o;
-            if (!c.getCartesjugador().getNom().equals(jugador.getNom()))
+            if (!c.getCartesJugador().getNom().equals(jugador.getNom()))
                 continue;
             cartesListFinal.add(c);
         }
@@ -48,7 +48,7 @@ public class CartaDAO extends GenericDAO<Cartes, Integer> implements ICartaDAO {
         List<Cartes> cartesListFinal = new ArrayList<>();
         for(Object o : cartesList){
             Cartes c = (Cartes) o;
-            if (!c.getCartesjugador().getNom().equals(jugador.getNom()) && !c.getCartatipusCarta().getNom().equals("Has fallat!"))
+            if (!c.getCartesJugador().getNom().equals(jugador.getNom()) && !c.getCartaTipusCarta().getNom().equals("Has fallat!"))
                 continue;
             cartesListFinal.add(c);
         }

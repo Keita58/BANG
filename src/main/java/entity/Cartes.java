@@ -2,7 +2,6 @@ package entity;
 
 import jakarta.persistence.*;
 
-import javax.annotation.processing.Generated;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,7 +23,7 @@ public class Cartes implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="idTipusCartes")
-    TipusCartes CartatipusCarta;
+    TipusCartes CartaTipusCarta;
 
     @ManyToOne
     @JoinColumn(name = "idJugador")
@@ -59,20 +58,20 @@ public class Cartes implements Serializable {
         this.numeroCarta = numeroCarta;
     }
 
-    public TipusCartes getCartatipusCarta() {
-        return CartatipusCarta;
+    public TipusCartes getCartaTipusCarta() {
+        return CartaTipusCarta;
     }
 
-    public void setCartatipusCarta(TipusCartes cartatipusCarta) {
-        CartatipusCarta = cartatipusCarta;
+    public void setCartaTipusCarta(TipusCartes CartaTipusCarta) {
+        this.CartaTipusCarta = CartaTipusCarta;
     }
 
-    public Jugadors getCartesjugador() {
+    public Jugadors getCartesJugador() {
         return jugadorQueTeLesCartes;
     }
 
-    public void setCartesjugador(Jugadors cartesjugador) {
-        this.jugadorQueTeLesCartes = cartesjugador;
+    public void setCartesJugador(Jugadors cartesJugador) {
+        this.jugadorQueTeLesCartes = cartesJugador;
     }
 
     @Override

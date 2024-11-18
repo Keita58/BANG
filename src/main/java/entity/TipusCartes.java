@@ -3,7 +3,6 @@ package entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -104,6 +103,14 @@ public class TipusCartes implements Serializable {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Set<Cartes> getCartes() {
+        return cartes;
+    }
+
+    public void setCartes(Set<Cartes> cartes) {
+        this.cartes = cartes;
     }
 
     @Override

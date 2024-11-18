@@ -3,7 +3,6 @@ package entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -53,6 +52,14 @@ public class Rols implements Serializable {
 
     public void setDescripcioRol(String descripcioRol) {
         this.descripcioRol = descripcioRol;
+    }
+
+    public Set<Jugadors> getJugador() {
+        return jugador;
+    }
+
+    public void setJugador(Set<Jugadors> jugador) {
+        this.jugador = jugador;
     }
 
     @Override

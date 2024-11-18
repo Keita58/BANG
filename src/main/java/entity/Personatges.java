@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Persontges")
+@Table(name = "Personatges")
 public class Personatges implements Serializable {
 
     @Id
@@ -50,6 +50,14 @@ public class Personatges implements Serializable {
 
     public void setDescripcio(byte[] descripcio) {
         this.descripcioPersonatge = descripcio;
+    }
+
+    public Jugadors getPersonatgeAmbJugador() {
+        return personatgeAmbJugador;
+    }
+
+    public void setPersonatgeAmbJugador(Jugadors personatgeAmbJugador) {
+        this.personatgeAmbJugador = personatgeAmbJugador;
     }
 
     @Override

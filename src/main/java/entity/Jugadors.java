@@ -3,7 +3,6 @@ package entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -81,6 +80,54 @@ public class Jugadors implements Serializable {
 
     public void setPosicio(int posicio) {
         this.posicioJugador = posicio;
+    }
+
+    public Armes getArmaJugador() {
+        return armaJugador;
+    }
+
+    public void setArmaJugador(Armes armaJugador) {
+        this.armaJugador = armaJugador;
+    }
+
+    public Rols getRolJugador() {
+        return rolJugador;
+    }
+
+    public void setRolJugador(Rols rolJugador) {
+        this.rolJugador = rolJugador;
+    }
+
+    public Personatges getPersonatgeDelJugador() {
+        return personatgeDelJugador;
+    }
+
+    public void setPersonatgeDelJugador(Personatges personatgeDelJugador) {
+        this.personatgeDelJugador = personatgeDelJugador;
+    }
+
+    public Set<Cartes> getCartes() {
+        return cartes;
+    }
+
+    public void setCartes(Set<Cartes> cartes) {
+        this.cartes = cartes;
+    }
+
+    public Set<Jugadors> getJugadorsRivals() {
+        return jugadorsRivals;
+    }
+
+    public void setJugadorsRivals(Set<Jugadors> jugadorsRivals) {
+        this.jugadorsRivals = jugadorsRivals;
+    }
+
+    public Set<Partides> getPartidesPropies() {
+        return partidesPropies;
+    }
+
+    public void setPartidesPropies(Set<Partides> partidesPropies) {
+        this.partidesPropies = partidesPropies;
     }
 
     @Override

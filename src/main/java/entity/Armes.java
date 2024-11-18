@@ -65,6 +65,14 @@ public class Armes implements Serializable{
         this.distanciaArma = distanciaArma;
     }
 
+    public Jugadors getJugador() {
+        return jugador;
+    }
+
+    public void setJugador(Jugadors jugador) {
+        this.jugador = jugador;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

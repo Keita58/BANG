@@ -35,7 +35,7 @@ public class Partides implements Serializable {
     }
 
     public Partides(LocalDateTime dataInici) {
-        dataInici = dataInici;
+        this.dataIniciPartida = dataInici;
     }
 
     public Partides(boolean finalitzada, LocalDateTime dataInici, LocalDateTime dataFinal) {
@@ -50,6 +50,30 @@ public class Partides implements Serializable {
 
     public void setDataInici(LocalDateTime dataInici) {
         this.dataIniciPartida = dataInici;
+    }
+
+    public boolean getPartidaFinalitzada() {
+        return partidaFinalitzada;
+    }
+
+    public void setPartidaFinalitzada(boolean partidaFinalitzada) {
+        this.partidaFinalitzada = partidaFinalitzada;
+    }
+
+    public LocalDateTime getDataFinalPartida() {
+        return dataFinalPartida;
+    }
+
+    public void setDataFinalPartida(LocalDateTime dataFinalPartida) {
+        this.dataFinalPartida = dataFinalPartida;
+    }
+
+    public Set<Jugadors> getPartidaJugador() {
+        return partidaJugador;
+    }
+
+    public void setPartidaJugador(Set<Jugadors> partidaJugador) {
+        this.partidaJugador = partidaJugador;
     }
 
     @Override

@@ -11,8 +11,6 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
 import utils.Util;
 
-import jakarta.persistence.EntityManagerFactory;
-
 public class GenericDAO<T, ID extends Serializable> implements IGenericDAO<T, ID> {
 
     EntityManagerFactory factory;
@@ -135,7 +133,5 @@ public class GenericDAO<T, ID extends Serializable> implements IGenericDAO<T, ID
     @Override
     public Class<T> getEntityClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-
     }
-
 }
