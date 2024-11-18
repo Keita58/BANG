@@ -8,7 +8,7 @@ public class Util {
 
     public static synchronized EntityManagerFactory getCurrentEntityManager() {
         if (factory == null) {
-            factory = Persistence.createEntityManagerFactory("bang");
+            factory = Persistence.createEntityManagerFactory("Bang");
         }
         return factory;
     }
