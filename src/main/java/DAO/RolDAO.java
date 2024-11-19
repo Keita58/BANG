@@ -1,6 +1,6 @@
 package DAO;
 
-import entity.Rol;
+import entity.Rols;
 
-public class RolDAO extends GenericDAO<Rol, Integer> implements IRolDAO {
+public class RolDAO extends GenericDAO<Rols, Integer> implements IRolDAO {
 }

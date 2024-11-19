@@ -18,6 +18,8 @@ public class MySQLFactory implements DAOFactory{
             return new PartidaDAO();
         }else if ("jugador".equalsIgnoreCase(daoType)) {
             return new JugadorDAO();
+        }else if ("jugadorRival".equalsIgnoreCase(daoType)){
+            return new JugadorsRivalsDAO();
         }
         return null;
     }

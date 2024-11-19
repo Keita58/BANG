@@ -3,6 +3,7 @@ package entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,12 +35,11 @@ public class Jugadors implements Serializable {
     @OneToOne(mappedBy = "personatgeAmbJugador", cascade = CascadeType.ALL)
     private Personatges personatgeDelJugador;
 
-    @OneToMany(mappedBy = "cartesjugador")
+    @OneToMany(mappedBy = "jugadorQueTeLesCartes")
     private Set<Cartes> cartes;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "JugadorsRivals", joinColumns = {@JoinColumn(name = "idJugador")}, inverseJoinColumns = {@JoinColumn(name = "idJugador")})
-    Set<Jugadors> jugadorsRivals;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "id.idJugador")
+    Set<JugadorsRivals> jugadorsRivals;
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "partidaJugador", fetch = FetchType.EAGER)
     private Set<Partides> partidesPropies;
@@ -56,6 +56,9 @@ public class Jugadors implements Serializable {
         this.nomJugador = nom;
         this.guanyats = guanyats;
         this.posicioJugador = posicio;
+        cartes= new HashSet<>();
+        jugadorsRivals= new HashSet<>();
+        partidesPropies= new HashSet<>();
     }
 
     public int getIdJugador() {
@@ -122,11 +125,11 @@ public class Jugadors implements Serializable {
         this.cartes = cartes;
     }
 
-    public Set<Jugadors> getJugadorsRivals() {
+    public Set<JugadorsRivals> getJugadorsRivals() {
         return jugadorsRivals;
     }
 
-    public void setJugadorsRivals(Set<Jugadors> jugadorsRivals) {
+    public void setJugadorsRivals(Set<JugadorsRivals> jugadorsRivals) {
         this.jugadorsRivals = jugadorsRivals;
     }
 

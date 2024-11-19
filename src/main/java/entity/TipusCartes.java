@@ -34,7 +34,7 @@ public class TipusCartes implements Serializable {
     @Column(name = "Color", nullable = false)
     private Color color;
 
-    @OneToMany(mappedBy = "CartatipusCarta")
+    @OneToMany(mappedBy = "CartaTipusCarta")
     Set<Cartes> cartes;
 
     public TipusCartes(){

@@ -1,8 +1,8 @@
 package DAO;
 
-import entity.Rol;
+import entity.Rols;
 
 import java.io.Serializable;
 
-public interface IRolDAO extends IGenericDAO<Rol, Integer>, Serializable {
+public interface IRolDAO extends IGenericDAO<Rols, Integer>, Serializable {
 }

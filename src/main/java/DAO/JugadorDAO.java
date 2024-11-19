@@ -18,8 +18,6 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
             Jugadors j = (Jugadors) jugador;
             if(j.getPersonatgeDelJugador() != null)
                 jugadorsAmbPersonatges.add(j);
-            else
-                continue;
         }
         return jugadorsAmbPersonatges;
     }
@@ -34,7 +32,6 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
                 if(j.getPersonatgeDelJugador().getBales() > 0)
                     jugadorsAmbPersonatges.add(j);
             }
-            continue;
         }
         return jugadorsAmbPersonatges;
     }
@@ -42,27 +39,33 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
     public List<Jugadors> RetornarJugadorsOrdenats() {
 
         List<Jugadors> jugadors = (List<Jugadors>) this.findAll();
+        List<Jugadors> jugadorsVida = new ArrayList<>();
 
-        Comparator<Jugadors> comparadorPosicio = new Comparator<Jugadors>() {
-            
-            @Override
-            public int compare(Jugadors j1, Jugadors j2) {
-                return j1.getPosicio() - j2.getPosicio();
-            }
-        };
-        Collections.sort(jugadors, comparadorPosicio);
-        return jugadors;
+        for (Object ju : jugadors) {
+            Jugadors j = (Jugadors) ju;
+            if(j.getPersonatgeDelJugador().getBales() > 0)
+                jugadorsVida.add(j);
+        }
+        Comparator<Jugadors> comparadorPosicio = Comparator.comparingInt(Jugadors::getPosicio);
+        jugadorsVida.sort(comparadorPosicio);
+        return jugadorsVida;
     }
 
     public List<Jugadors> getJugadorsRolsVida(Rol rol) {
         
         List<Jugadors> jugadors = (List<Jugadors>) this.findAll();
         List<Jugadors> jugadorsAmbRol = new ArrayList<>();
-        for (Object j : jugadors) {
+        List<Jugadors> jugadorsVida = new ArrayList<>();
+
+        for (Object ju : jugadors) {
+            Jugadors j = (Jugadors) ju;
+            if(j.getPersonatgeDelJugador().getBales() > 0)
+                jugadorsVida.add(j);
+        }
+        for (Object j : jugadorsVida) {
             Jugadors ju = (Jugadors) j;
             if(ju.getRolJugador().getNomRol().equals(rol))
                 jugadorsAmbRol.add(ju);
-            continue;
         }
         return jugadorsAmbRol;
     }
