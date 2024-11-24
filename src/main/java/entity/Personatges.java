@@ -18,8 +18,8 @@ public class Personatges implements Serializable {
     @Column(name = "Nom", length = 20, nullable = false)
     private String nomPersonatge;
 
-    @Column(name = "Descripcio", nullable = false)
-    @Basic(optional = false, fetch = FetchType.EAGER)
+    @Column(name = "Descripcio")
+    @Basic(fetch = FetchType.EAGER)
     @Lob()
     private byte[] descripcioPersonatge;
 

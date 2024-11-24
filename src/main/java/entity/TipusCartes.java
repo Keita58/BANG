@@ -3,6 +3,7 @@ package entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class TipusCartes implements Serializable {
     private Color color;
 
     @OneToMany(mappedBy = "CartaTipusCarta")
-    Set<Cartes> cartes;
+    Set<Cartes> cartes = new HashSet<>();
 
     public TipusCartes(){
         super();
