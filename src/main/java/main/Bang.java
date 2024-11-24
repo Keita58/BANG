@@ -432,11 +432,6 @@ public class Bang {
         System.out.println("FINAL REPARTIR POSICIONES");
     }
 
-
-
-
-
-
     public static void FinalPartida(){
 
 
