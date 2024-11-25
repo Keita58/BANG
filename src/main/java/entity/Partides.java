@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,17 +32,22 @@ public class Partides implements Serializable {
 
     public Partides() {
         super();
+        this.partidaJugador = new HashSet<>();
         this.dataIniciPartida = LocalDateTime.now();
     }
 
     public Partides(LocalDateTime dataInici) {
+        super();
         this.dataIniciPartida = dataInici;
+        this.partidaJugador = new HashSet<>();
     }
 
     public Partides(boolean finalitzada, LocalDateTime dataInici, LocalDateTime dataFinal) {
+        super();
         this.partidaFinalitzada = finalitzada;
         this.dataIniciPartida = dataInici;
         this.dataFinalPartida = dataFinal;
+        this.partidaJugador = new HashSet<>();
     }
 
     public int getIdPartida() {

@@ -46,19 +46,21 @@ public class Jugadors implements Serializable {
 
     public Jugadors() {
         super();
+        this.cartes = new HashSet<>();
     }
 
     public Jugadors(String nom) {
         this.nomJugador = nom;
+        this.cartes = new HashSet<>();
     }
 
     public Jugadors(String nom, int guanyats, int posicio) {
         this.nomJugador = nom;
         this.guanyats = guanyats;
         this.posicioJugador = posicio;
-        cartes= new HashSet<>();
         jugadorsRivals= new HashSet<>();
         partidesPropies= new HashSet<>();
+        this.cartes = new HashSet<>();
     }
 
     public int getIdJugador() {
