@@ -192,7 +192,7 @@ public class Bang {
         }
 
         HashSet<Jugadors> jugadors = new HashSet<>();
-        for(int i = 1; i < 8; i++) {
+        for(int i = 1; i < 6; i++) {
             Jugadors j = new Jugadors("Jugadors" + i);
             jDAO.create(j);
             jugadors.add(j);
@@ -470,7 +470,6 @@ public class Bang {
         while(!acabarPartida) {
             int dolentsMorts = 0;
             for(Jugadors j : jList) {
-                System.out.println("El torn és del jugador " + j.getNom() + ".");
                 if (j.getPersonatgeDelJugador().getBales() <= 0 && j.getRolJugador().getNomRol() == Rol.XERIF) {
                     acabarPartida = true;
                     break;
@@ -481,7 +480,6 @@ public class Bang {
                     else
                         continue;
                 }
-
                 switch (jList.size())
                 {
                     case 4:
@@ -495,7 +493,7 @@ public class Bang {
                             acabarPartida = true;
                         break;
                 }
-
+                System.out.println("El torn és del jugador " + j.getNom() + ".");
                 if (j.getPersonatgeDelJugador().getBales() > 0){
                     AgafarCarta(j);
                     AgafarCarta(j);
@@ -503,8 +501,11 @@ public class Bang {
                 }
             }
             for(Jugadors j : jList) {
-                for(int i = 0 ; i < (Math.abs(j.getPersonatgeDelJugador().getBales() - j.getCartes().size())); i++) {
-                    DeixarCartes(j);
+                if(j.getCartes().size() > j.getPersonatgeDelJugador().getBales()) {
+                    int cartes = j.getCartes().size();
+                    for(int i = 0 ; i < (Math.abs(j.getPersonatgeDelJugador().getBales() - cartes)); i++) {
+                        DeixarCartes(j);
+                    }
                 }
             }
         }
@@ -535,13 +536,17 @@ public class Bang {
         IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
 
         List<Cartes> cartes = cDAO.getCartesJugador(j);
-        Random r = new Random();
-        int carta = r.nextInt(0, cartes.size());
-        cartes.get(carta).setCartesJugador(null);
-        j.getCartes().remove(cartes.get(carta));
-        cDAO.update(cartes.get(carta));
-        jDAO.update(j);
-        System.out.println("El jugador " + j.getNom() + " ha deixat una carta.");
+        Collections.shuffle(cartes);
+        if(j.getCartes().size() > 0) {
+            cartes.get(0).setCartesJugador(null);
+            j.getCartes().remove(cartes.get(0));
+            cDAO.update(cartes.get(0));
+            jDAO.update(j);
+            System.out.println("El jugador " + j.getNom() + " ha deixat una carta.");
+        }
+        else {
+            System.out.println("El jugador no té cartes per descartar :(");
+        }
     }
 
     public static void TirarCartes(Jugadors j) {
@@ -554,7 +559,10 @@ public class Bang {
         List<Jugadors> jugadorsAmbVida = jDAO.getJugadorsAmbPersonatgesVidaAltres(j);
         List<Cartes> cartes = cDAO.getCartesJugador(j);
         Random r = new Random();
-        int cartesATirar = r.nextInt(1, (Math.max(cartes.size() - 3, 0)));
+        int cartesATirar = 0;
+        if(j.getCartes().size() > 0) {
+            cartesATirar = r.nextInt(1, cartes.size());
+        }
         //Mirem de retornar no totes les cartes que té el jugador a la mà (per ara el nombre màxim de cartes que té menys 3)
         //Si aquesta resta donés menys de 0 el MAth.max retornaria el 0, ja que seria el nombre més gran.
         Collections.shuffle(cartes);
@@ -577,14 +585,18 @@ public class Bang {
                         Set<JugadorsRivals> rivals = j.getJugadorsRivals();
                         for(JugadorsRivals jr : rivals) {
                             if(jr.getIdRival().getIdRival().getIdJugador() == ju.getIdJugador()) {
-                                if(j.getArmaJugador().getDistanciaArma() >= jr.getDistanciaRival()) {
-                                    ju.getPersonatgeDelJugador().setBales(ju.getPersonatgeDelJugador().getBales() - 1);
-                                    System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + "! Quina mala baba.");
-                                    acabat = true;
+                                if((j.getRolJugador().getNomRol() == Rol.AJUDANT && jr.getIdRival().getIdRival().getRolJugador().getNomRol() == Rol.XERIF)) {
+                                    System.out.println("L'Ajudant no pot disparar el Xerif! Seria traició.");
                                 }
                                 else {
-                                    System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + " però no hi arriba! Quina mala sort");
-                                    acabat = true;
+                                    if (j.getArmaJugador().getDistanciaArma() >= jr.getDistanciaRival()) {
+                                        ju.getPersonatgeDelJugador().setBales(ju.getPersonatgeDelJugador().getBales() - 1);
+                                        System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + "! Quina mala baba.");
+                                        acabat = true;
+                                    } else {
+                                        System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + " però no hi arriba! Quina mala sort");
+                                        acabat = true;
+                                    }
                                 }
                                 break;
                             }
@@ -592,7 +604,6 @@ public class Bang {
                         if(acabat)
                             break;
                     }
-
                     break;
                 case 2: //Miratelescòpica
                     //Collections.shuffle(jugadorsAmbVida);
@@ -659,6 +670,7 @@ public class Bang {
         for (Jugadors j : jList) {
             if (j.getPersonatgeDelJugador().getBales()>0) {
                 j.setGuanyats(j.getGuanyats()+1);
+                System.out.println("Ha guanyat: "+j.getNom()+" amb el rol: "+j.getRolJugador().getNomRol()+"!!");
                 jDao.update(j);
             }
         }
