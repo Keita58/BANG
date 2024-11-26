@@ -37,9 +37,8 @@ public class CartaDAO extends GenericDAO<Cartes, Integer> implements ICartaDAO {
         List<Cartes> cartesListFinal = new ArrayList<>();
         for(Object o : cartesList){
             Cartes c = (Cartes) o;
-            if (!c.getCartesJugador().getNom().equals(jugador.getNom()))
-                continue;
-            cartesListFinal.add(c);
+            if (c.getCartesJugador() != null && c.getCartesJugador().getNom().equals(jugador.getNom()))
+                cartesListFinal.add(c);
         }
         return cartesListFinal;
     }
