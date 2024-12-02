@@ -35,6 +35,20 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
         return jugadorsAmbPersonatges;
     }
 
+    public List<Jugadors> getJugadorsAmbPersonatgesVida() {
+
+        List<Jugadors> jugadors = (List<Jugadors>) this.findAll();
+        List<Jugadors> jugadorsAmbPersonatges = new ArrayList<>();
+        for (Object ju : jugadors) {
+            Jugadors j = (Jugadors) ju;
+            if(j.getPersonatgeDelJugador().getBales() > 0)
+                jugadorsAmbPersonatges.add(j);
+
+        }
+        return jugadorsAmbPersonatges;
+    }
+
+
     public List<Jugadors> RetornarJugadorsOrdenats() {
 
         List<Jugadors> jugadors = (List<Jugadors>) this.findAll();

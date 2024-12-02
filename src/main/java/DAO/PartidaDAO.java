@@ -17,4 +17,6 @@ public class PartidaDAO extends GenericDAO<Partides, Integer> implements IPartid
         
         return null;
     }
+
+
 }

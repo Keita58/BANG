@@ -9,6 +9,7 @@ import java.util.List;
 public interface IJugadorDAO extends IGenericDAO<Jugadors, Integer>, Serializable {
     List<Jugadors> getJugadorsAmbPersonatges();
     List<Jugadors> getJugadorsAmbPersonatgesVidaAltres(Jugadors jugador);
+    List<Jugadors> getJugadorsAmbPersonatgesVida();
     List<Jugadors> RetornarJugadorsOrdenats();
     List<Jugadors> getJugadorsRolsVida(Rol rol);
 }

@@ -15,18 +15,76 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Bang {
+    static Scanner lectura;
 
     public static void main(String[] args) {
-
+        lectura = new Scanner(System.in);
         Carregar();
+        Menu();
+        Util.close();
+        System.out.println("FINAL PARTIDA");
+    }
+
+    private static void Menu() {
+        System.out.println();
+        System.out.println("Benvingut a Bang! Què vols fer?\n" +
+                "1-> Jugar partida :)\n" +
+                "2-> Veure els jugadors que tenen un personatge associat\n" +
+                "3-> Finalitzar la partida\n" +
+                "4-> El jugador agafa una carta\n" +
+                "5-> Sortir del menu :(");
+        int opcio = Integer.parseInt(lectura.nextLine());
+        switch(opcio){
+            case 1:
+                ReiniciarValorsBBDD();
+                Jugar();
+                Menu();
+                break;
+            case 2:
+                MirarPersonatgesAssociats();
+                Menu();
+                break;
+            case 3:
+                FinalPartida();
+                Menu();
+                break;
+            case 4:
+                AgafarCartes(new Jugadors("Provisional",1,4));
+                Menu();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void MirarPersonatgesAssociats() {
+        System.out.println("Mostrant els jugadors que tenen un personatge associat!");
+        DAOFactoryImpl dao = new DAOFactoryImpl();
+        DAOFactory daoFactory = dao.getFactory("MySQL");
+        IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
+
+        List<Jugadors> jlist = jDAO.getJugadorsAmbPersonatges();
+        System.out.println(jlist.size());
+        for (Jugadors j : jlist) {
+            System.out.println("Jugador: " + j);
+        }
+    }
+
+    private static void Jugar(){
+        int j = 0;
+        do {
+            System.out.println("Quants jugadors vols a la simulació? (Entre 4 i 7 jugadors)");
+            j = Integer.parseInt(lectura.nextLine());
+        } while(j > 8 && j < 3);
+
+        TornarAJugar(j);
         RepartirArma();
         RepartirRol();
         RepartirJugadors();
         RepartirPersonatges();
         RepartirCartes();
         BucleJoc();
-        Util.close();
-        System.out.println("FINAL PARTIDA");
+        ReiniciarValorsBBDD();
     }
 
     public static void Carregar() {
@@ -101,7 +159,7 @@ public class Bang {
         rDAO.create(rolRenegat);
         rDAO.create(rolMalfactor);
 
-        Partides joc = new Partides();
+        Partides joc = new Partides(true, LocalDateTime.now(), LocalDateTime.now());
         partDAO.create(joc);
 
         List<Cartes> cartes = new ArrayList<>();
@@ -191,15 +249,18 @@ public class Bang {
             ca++;
         }
 
-        HashSet<Jugadors> jugadors = new HashSet<>();
-        for(int i = 1; i < 6; i++) {
+        HashSet<Jugadors> ju = new HashSet<>();
+        for(int i = 1; i < 8; i++) {
             Jugadors j = new Jugadors("Jugadors" + i);
             jDAO.create(j);
-            jugadors.add(j);
+            j.setPartidesPropies(Set.of(joc));
+            ju.add(j);
+            jDAO.update(j);
         }
-        joc.setPartidaJugador(jugadors);
+        joc.setPartidaJugador(ju);
         partDAO.update(joc);
-
+        RepartirPersonatges();
+        RepartirRol();
         System.out.println("FINAL CARREGAR");
     }
 
@@ -463,8 +524,15 @@ public class Bang {
         System.out.println("COMENÇA EL JOC");
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
         IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
+        IPartidaDAO pDAO = (IPartidaDAO) daoFactory.create("partida");
 
-        List<Jugadors> jList = jDAO.findAll();
+        Partides p = pDAO.getPartidaFinal();
+        List<Jugadors> jListAll = jDAO.findAll();
+        List<Jugadors> jList = new ArrayList<>();
+        for(Jugadors j : jListAll) {
+            if(j.getPartidesPropies().contains(p))
+                jList.add(j);
+        }
         boolean acabarPartida = false;
 
         while(!acabarPartida) {
@@ -493,8 +561,8 @@ public class Bang {
                             acabarPartida = true;
                         break;
                 }
-                System.out.println("El torn és del jugador " + j.getNom() + ".");
                 if (j.getPersonatgeDelJugador().getBales() > 0){
+                    System.out.println("El torn és del jugador " + j.getNom() + ".");
                     AgafarCarta(j);
                     AgafarCarta(j);
                     TirarCartes(j);
@@ -526,8 +594,22 @@ public class Bang {
         listCartes.get(cartaRandom).setCartesJugador(j);
         jDAO.update(j);
         cDAO.update(listCartes.get(cartaRandom));
-        System.out.println("El jugador " + j.getNom() + " ha agafat una carta.");
+        System.out.println("El jugador " + j.getNom() + " ha agafat una carta: "+listCartes.get(cartaRandom));
     }
+
+    public static void AgafarCartes(Jugadors j) {
+
+        DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
+        ICartaDAO cDAO = (ICartaDAO) daoFactory.create("carta");
+
+        Random r = new Random();
+        List<Cartes> listCartes = cDAO.getCartesSenseJugador();
+        int cartaRandom = r.nextInt(0, listCartes.size());
+        j.getCartes().add(listCartes.get(cartaRandom));
+        listCartes.get(cartaRandom).setCartesJugador(j);
+        System.out.println("El jugador " + j.getNom() + " ha agafat una carta: "+listCartes.get(cartaRandom));
+    }
+
 
     public static void DeixarCartes(Jugadors j) {
 
@@ -576,6 +658,7 @@ public class Bang {
             jDAO.update(j);
         }
 
+        boolean mort = false;
         for(Cartes c : retornar) {
             switch(c.getCartaTipusCarta().getIdTipusCartes()) {
                 case 1: //BANG!
@@ -584,7 +667,7 @@ public class Bang {
                     for(Jugadors ju : jugadorsAmbVida) {
                         Set<JugadorsRivals> rivals = j.getJugadorsRivals();
                         for(JugadorsRivals jr : rivals) {
-                            if(jr.getIdRival().getIdRival().getIdJugador() == ju.getIdJugador()) {
+                            if(jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() > 0 && jr.getIdRival().getIdRival().getIdJugador() == ju.getIdJugador()) {
                                 if((j.getRolJugador().getNomRol() == Rol.AJUDANT && jr.getIdRival().getIdRival().getRolJugador().getNomRol() == Rol.XERIF)) {
                                     System.out.println("L'Ajudant no pot disparar el Xerif! Seria traició.");
                                 }
@@ -637,12 +720,16 @@ public class Bang {
                 case 7: //Indis
                     j.getPersonatgeDelJugador().setBales(j.getPersonatgeDelJugador().getBales() - 1);
                     System.out.println("Ha jugat un Indis. S'ha fet un tret als peus.");
+                    if(j.getPersonatgeDelJugador().getBales() == 0)
+                        mort = true;
                     break;
                 case 8: //Cervesa
                     CurarPersonatge(j);
                     System.out.println("Ha tirat una Cervesa. Mai va malament emborratxar-se una mica.");
                     break;
             }
+            if(mort)
+                break;
         }
     }
 
@@ -668,7 +755,7 @@ public class Bang {
         List<Jugadors> jList = jDao.findAll();
 
         for (Jugadors j : jList) {
-            if (j.getPersonatgeDelJugador().getBales()>0) {
+            if (j.getPersonatgeDelJugador().getBales() > 0) {
                 j.setGuanyats(j.getGuanyats()+1);
                 System.out.println("Ha guanyat: "+j.getNom()+" amb el rol: "+j.getRolJugador().getNomRol()+"!!");
                 jDao.update(j);
@@ -678,5 +765,68 @@ public class Bang {
         partList.get(partList.size() - 1).setPartidaFinalitzada(true);
         partDAO.update(partList.get(partList.size() - 1));
         System.out.println("ACABA EL JOC");
+    }
+
+    public static void ReiniciarValorsBBDD() {
+        DAOFactoryImpl dao = new DAOFactoryImpl();
+        DAOFactory daoFactory = dao.getFactory("MySQL");
+        ICartaDAO cDAO = (ICartaDAO) daoFactory.create("carta");
+        IJugadorDAO jDao = (IJugadorDAO) daoFactory.create("jugador");
+        IPersonatgeDAO pDao = (IPersonatgeDAO) daoFactory.create("personatge");
+        IArmaDAO aDao=(IArmaDAO)daoFactory.create("arma");
+        IJugadorsRivalsDAO jrDAO=(IJugadorsRivalsDAO) daoFactory.create("jugadorRival");
+        List<Cartes> cartesList=cDAO.findAll();
+        List<Jugadors> listJugadors = jDao.findAll();
+        List<Personatges> listPersonatges = pDao.findAll();
+        List<Armes> armesList= aDao.findAll();
+        List<JugadorsRivals> jugadorsRivalsList=jrDAO.findAll();
+
+        for (Cartes c : cartesList) {
+            c.setCartesJugador(null);
+            cDAO.update(c);
+        }
+
+        for(Jugadors j : listJugadors){
+            j.setArmaJugador(null);
+            j.setPersonatgeDelJugador(null);
+            j.setCartes(null);
+            jDao.update(j);
+        }
+
+        for(Personatges p : listPersonatges) {
+            p.setPersonatgeAmbJugador(null);
+            pDao.update(p);
+        }
+
+        for(Armes a : armesList){
+            a.setJugador(null);
+            aDao.update(a);
+        }
+
+        for(JugadorsRivals jr : jugadorsRivalsList){
+            jrDAO.delete(jr.getIdRival().getIdJugador().getIdJugador());
+            jrDAO.delete(jr.getIdRival().getIdRival().getIdJugador());
+        }
+    }
+
+    public static void TornarAJugar(int jugadors) {
+
+        DAOFactoryImpl dao = new DAOFactoryImpl();
+        DAOFactory daoFactory = dao.getFactory("MySQL");
+        IPartidaDAO pDAO = (IPartidaDAO) daoFactory.create("partida");
+        IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
+
+
+        Partides joc = new Partides();
+        HashSet<Jugadors> jugadorsSet = new HashSet<>();
+        List<Jugadors> jList;
+        jList = jDAO.findAll();
+        Collections.shuffle(jList);
+        for(int i = 0; i < jList.size(); i++) {
+            if(i < jugadors)
+                jugadorsSet.add(jList.get(i));
+        }
+        joc.setPartidaJugador(jugadorsSet);
+        pDAO.update(joc);
     }
 }
