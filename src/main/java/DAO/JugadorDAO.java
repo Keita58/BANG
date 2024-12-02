@@ -1,6 +1,7 @@
 package DAO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -81,5 +82,16 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
                 jugadorsAmbRol.add(ju);
         }
         return jugadorsAmbRol;
+    }
+
+    public List<Jugadors> getNumJugadors(int numJugadors) {
+
+        List<Jugadors> jugadors = (List<Jugadors>) this.findAll();
+        List<Jugadors> jugadorsAmbPersonatges = new ArrayList<>();
+        for (int i = 0; i < numJugadors; i++) {
+            jugadorsAmbPersonatges.add(jugadors.get(i));
+        }
+        Collections.shuffle(jugadorsAmbPersonatges);
+        return jugadorsAmbPersonatges;
     }
 }

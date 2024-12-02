@@ -67,9 +67,6 @@ public class Jugadors implements Serializable {
         return idJugador;
     }
 
-    public void setIdJugador(int idJugador) {
-        this.idJugador = idJugador;
-    }
 
     public String getNom() {
         return nomJugador;
