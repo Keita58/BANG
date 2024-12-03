@@ -95,7 +95,7 @@ public class Bang {
         do {
             System.out.println("Quants jugadors vols a la simulació? (Entre 4 i 7 jugadors)");
             j = Integer.parseInt(lectura.nextLine());
-        } while(j > 8 || j < 3);
+        } while(j > 7 || j < 4);
 
         TornarAJugar(j);
         RepartirArma(j);
@@ -574,43 +574,65 @@ public class Bang {
 
         IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
 
+        // Llista de tots els jugadors actuals de la partida.
         List<Jugadors> jList = jDAO.getNumJugadors(numJugadors);
+        // Llista dels jugadors dolents morts (Malfactors i Renegats). Per evitar contar-los més d'una vegada.
         List<Jugadors> jMorts = new ArrayList<>();
         boolean acabarPartida = false;
 
         while(!acabarPartida) {
             int dolentsMorts = 0;
             for(Jugadors j : jList) {
+                // Agafem els jugadors vius actuals per comprovar que no estigui jugant un jugador sol o si es dona el cas que estan vius el xèrif i l'ajudant.
                 List<Jugadors> jAmbVida = jDAO.getNumJugadorsAmbVida(numJugadors);
                 if(jAmbVida.size() > 1){
                     if(jAmbVida.size() == 2) {
+                        // Si hi ha dos jugadors vius i són el xèrif i l'ajudant s'acaba el joc
                         if((jAmbVida.get(0).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(0).getRolJugador().getNomRol() == Rol.AJUDANT) && (jAmbVida.get(1).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(1).getRolJugador().getNomRol() == Rol.AJUDANT)) {
                             acabarPartida = true;
                             break;
                         }
                     }
+                    //Si el jugador mort és el xèrif s'acaba el joc
                     if (j.getPersonatgeDelJugador().getBales() == 0 && j.getRolJugador().getNomRol() == Rol.XERIF) {
                         acabarPartida = true;
                         break;
                     }
                     else if(j.getPersonatgeDelJugador().getBales() == 0) {
-                        CalcularDistancia(numJugadors);
+                        boolean trobat = false;
+                        for(Jugadors jM : jMorts){
+                            // Si el rol del jugador mort és cap dels dolents i aquest no està dins la llista dels morts l'afegim i el contem.
+                            if(jM.equals(j)) {
+                                trobat = true;
+                                break;
+                            }
+                        }
+                        if(!trobat) {
+                            jMorts.add(j);
+                        }
+                        else {
+                            // Si hi ha un jugador mort hem de tornar a contar les distàncies dels nous jugadors
+                            CalcularDistancia(numJugadors);
+                            trobat = false;
+                        }
                         if(j.getRolJugador().getNomRol() == Rol.RENEGAT || j.getRolJugador().getNomRol() == Rol.MALFACTOR) {
-                            boolean trobat = false;
                             for(Jugadors jM : jMorts){
+                                // Si el rol del jugador mort és cap dels dolents i aquest no està dins la llista dels morts l'afegim i el contem.
                                 if(jM.equals(j)) {
                                     trobat = true;
                                     break;
                                 }
                             }
-                            if(!trobat) {
-                                dolentsMorts++;
-                                jMorts.add(j);
-                            }
                         }
                         else
                             continue;
+                        // Si no ha trobat l'enemic dins la llista de morts l'afegeix i augmenta en 1 la variable dolentsMorts.
+                        if(!trobat) {
+                            dolentsMorts++;
+                            jMorts.add(j);
+                        }
                     }
+                    // Depenent del nombre de jugadors acabarem la partida si han mort 3 o 4 dolents (és a dir, que han mort tots).
                     switch (jList.size())
                     {
                         case 4:
@@ -624,7 +646,7 @@ public class Bang {
                                 acabarPartida = true;
                             break;
                     }
-
+                    // Torn d'un jugador: Agafa dues cartes i tira un nombre aleatori de cartes de les quals té a la mà actualment.
                     if (j.getPersonatgeDelJugador().getBales() > 0) {
                         System.out.println("El torn és del jugador " + j.getNom() + ". Té actualment " + j.getPersonatgeDelJugador().getBales() + " vides.");
                         AgafarCarta(j);
@@ -637,6 +659,8 @@ public class Bang {
                     break;
                 }
             }
+            // Si no hem acabat la partida obliguem els jugadors a retirar cartes de la seva mà fins a tenir-ne les mateixes que la vida del seu personatge.
+            // Les cartes que selecciona per retirar són aleatòries.
             if(!acabarPartida) {
                 for(Jugadors j : jList) {
                     if(j.getPersonatgeDelJugador().getBales() > 0 && j.getCartes().size() > j.getPersonatgeDelJugador().getBales()) {
@@ -653,7 +677,8 @@ public class Bang {
     }
 
     /**
-     *
+     * Calcula la distància entre els jugadors. Fa el mateix que {@link #RepartirJugadors(int)} però només la part de la distància,
+     * ja que aquesta funció la utilitzem per recalcular les distàncies entre els jugadors vius de la partida actual.
      * @param numJugadors Nombre de jugadors que jugaran al BANG! (s'especifica a la funció {@link #Jugar()}).
      */
     public static void CalcularDistancia(int numJugadors) {
@@ -662,7 +687,7 @@ public class Bang {
         IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
         IJugadorsRivalsDAO jrDAO = (IJugadorsRivalsDAO) daoFactory.create("jugadorRival");
 
-        //Calculem la distància entre enemics i creem els enemics rivals
+        //Calculem la distància entre enemics vius restatns i creem els enemics rivals
         List<Jugadors> jugadorsList = jDAO.getNumJugadorsAmbVida(numJugadors);
         Set<JugadorsRivals> enemics = new HashSet<>();
         int a = 0;
@@ -705,8 +730,8 @@ public class Bang {
     }
 
     /**
-     *
-     * @param j
+     * Agafa una carta de la pila de cartes de la base de dades de manera aleatòria.
+     * @param j Jugador que agafa la carta de la base de dades.
      */
     public static void AgafarCarta(Jugadors j) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -725,8 +750,9 @@ public class Bang {
     }
 
     /**
-     *
-     * @param j
+     * Funció que se'ns demana al {@link #Menu()}. Només realitza l'acció d'agafar una carta de la base de dades,
+     * però no guarda cap mena d'informació al jugador ni a la carta, ja que és només simbòlic.
+     * @param j Jugador que agafa la carta de la base de dades.
      */
     public static void AgafarCartes(Jugadors j) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -742,8 +768,9 @@ public class Bang {
     }
 
     /**
-     *
-     * @param j
+     * Elimina una carta aleatòria de la mà del jugador que es passa per paràmetre.
+     * Aquesta carta passa a estar a la pila de robar automàticament.
+     * @param j Jugador que descarta la carta
      */
     public static void DeixarCartes(Jugadors j) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -767,8 +794,9 @@ public class Bang {
     }
 
     /**
-     *
-     * @param j
+     * Simula l'acció de tirar un nombre aleatori de cartes a diferents jugadors o a si mateix.
+     * Les cartes provenen de la mà del jugador que es passa per paràmetre.
+     * @param j Jugador qeu tira les cartes
      */
     public static void TirarCartes(Jugadors j) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -783,6 +811,7 @@ public class Bang {
         Random r = new Random();
 
         int cartesATirar = 0;
+        // Si el jugador té cartes a la mà crea una variable del nombre de cartes que el jugador haurà de tirar.
         if(!j.getCartes().isEmpty()) {
             cartesATirar = r.nextInt(1, cartes.size());
         }
@@ -819,12 +848,16 @@ public class Bang {
                                     System.out.println("L'Ajudant no pot disparar el Xerif! Seria traició.");
                                 }
                                 else {
+                                    // Si l'arma del jugador té un rang major o igual a la distància amb el contrincant pot tirar la carta.
                                     if(j.getArmaJugador().getDistanciaArma() >= jr.getDistanciaRival()) {
+                                        // El contrincant perd una vida.
                                         jr.getIdRival().getIdRival().getPersonatgeDelJugador().setBales(jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() - 1);
                                         System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + "! Quina mala baba.");
                                         System.out.println("L'enemic ara té " + ju.getPersonatgeDelJugador().getBales() + " vides.");
                                         Set<Cartes> cartesEnemic = jr.getIdRival().getIdRival().getCartes();
+                                        // Una vegada el contrincant ha perdut una vida li mirem a la mà si té un "Has Fallat!"
                                         for(Cartes carta : cartesEnemic) {
+                                            // Si la té li tirem la carta
                                             if(carta.getCartaTipusCarta().getNom().equals("Has Fallat!")) {
                                                 carta.setCartesJugador(null);
                                                 jr.getIdRival().getIdRival().getCartes().remove(carta);
@@ -835,7 +868,9 @@ public class Bang {
                                                 break;
                                             }
                                         }
-                                    } else {
+                                    }
+                                    // En el cas que la distància fos major tiraria la carta igualment, però no faria cap efecte
+                                    else {
                                         System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + " però no hi arriba! Quina mala sort");
                                     }
                                     acabat = true;
@@ -851,6 +886,7 @@ public class Bang {
                 case 2: //Miratelescòpica
                     Set<JugadorsRivals> rivals = j.getJugadorsRivals();
 
+                    // Agafem un rival aleatòri de JugadorRivals i li disminuïm la distància en 1 (si aquesta era major a 0)
                     for(JugadorsRivals jr : rivals) {
                         if(jr.getDistanciaRival() > 0) {
                             jr.setDistanciaRival(jr.getDistanciaRival() - 1);
@@ -894,8 +930,9 @@ public class Bang {
     }
 
     /**
-     *
-     * @param j
+     * Funció extreta de codi igual a {@link #TirarCartes(Jugadors)} i que cura al personatge que es passa per paràmetre un punt de vida.
+     * Aquesta curació no pot superar el nombre màxim de vides del personatge que tingui un jugador.
+     * @param j Personatge a curar
      */
     private static void CurarPersonatge(Jugadors j) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -914,8 +951,9 @@ public class Bang {
     }
 
     /**
-     *
-     * @param numJugadors
+     * Funció que afegeix una victòria a la base de dades a aquells jugadors que encara estan vius.
+     * Una vegada els hi dona la victòria acaba la partida.
+     * @param numJugadors Nombre de jugadors jugant a la partida actual
      */
     public static void FinalPartida(int numJugadors){
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -943,7 +981,9 @@ public class Bang {
     }
 
     /**
-     *
+     * Reiniciem tots els valors necessàris de la base de dades per a poder començar una nova partida.
+     * Les dades reiniciades són principalment relacions, i en el cas dels personatges, en modificar la seva vida directament a la base de dades,
+     * tornar a posar en aquesta la vida màxima real dels personatges.
      */
     public static void ReiniciarValorsBBDD() {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
@@ -958,7 +998,6 @@ public class Bang {
         List<Jugadors> listJugadors = jDao.findAll();
         List<Personatges> listPersonatges = pDao.findAll();
         List<Armes> armesList= aDao.findAll();
-        List<JugadorsRivals> jugadorsRivalsList=jrDAO.findAll();
 
         for (Cartes c : cartesList) {
             c.setCartesJugador(null);
@@ -993,8 +1032,8 @@ public class Bang {
     }
 
     /**
-     *
-     * @param jugadors
+     * Funció per agafar el nombre de jugadors que es passa per paràmetre i afegir-los la nova partida creada.
+     * @param jugadors Nombre de jugadors que estan jugant la partida actualment
      */
     public static void TornarAJugar(int jugadors) {
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
