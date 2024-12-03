@@ -852,8 +852,8 @@ public class Bang {
                                     if(j.getArmaJugador().getDistanciaArma() >= jr.getDistanciaRival()) {
                                         // El contrincant perd una vida.
                                         jr.getIdRival().getIdRival().getPersonatgeDelJugador().setBales(jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() - 1);
-                                        System.out.println("Ha jugat un BANG! contra el jugador " + ju.getNom() + "! Quina mala baba.");
-                                        System.out.println("L'enemic ara té " + ju.getPersonatgeDelJugador().getBales() + " vides.");
+                                        System.out.println("Ha jugat un BANG! contra el jugador " +  jr.getIdRival().getIdRival().getPersonatgeDelJugador().getNom() + "! Quina mala baba.");
+                                        System.out.println("L'enemic ara té " +  jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() + " vides.");
                                         Set<Cartes> cartesEnemic = jr.getIdRival().getIdRival().getCartes();
                                         // Una vegada el contrincant ha perdut una vida li mirem a la mà si té un "Has Fallat!"
                                         for(Cartes carta : cartesEnemic) {
