@@ -94,4 +94,16 @@ public class JugadorDAO extends GenericDAO<Jugadors, Integer> implements IJugado
         Collections.shuffle(jugadorsAmbPersonatges);
         return jugadorsAmbPersonatges;
     }
+
+    public List<Jugadors> getNumJugadorsAmbVida(int numJugadors) {
+
+        List<Jugadors> jugadors = (List<Jugadors>) this.getNumJugadors(numJugadors);
+        List<Jugadors> jugadorsAmbPersonatges = new ArrayList<>();
+        for (int i = 0; i < numJugadors; i++) {
+            if(jugadors.get(i).getPersonatgeDelJugador().getBales() > 0)
+                jugadorsAmbPersonatges.add(jugadors.get(i));
+        }
+        Collections.shuffle(jugadorsAmbPersonatges);
+        return jugadorsAmbPersonatges;
+    }
 }

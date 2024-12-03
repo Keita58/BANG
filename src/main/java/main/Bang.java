@@ -99,7 +99,7 @@ public class Bang {
         IArmaDAO armDAO = (IArmaDAO) daoFactory.create("arma");
         IPartidaDAO partDAO = (IPartidaDAO) daoFactory.create("partida");
         IRolDAO rDAO = (IRolDAO) daoFactory.create("rol");
-        
+
         Personatges bart = new Personatges("Bart Cassidy", "g5".getBytes(StandardCharsets.UTF_8), 4);
         Personatges black = new Personatges("Black Jack", "descripcio de prova".getBytes(StandardCharsets.UTF_8), 4);
         Personatges calamity = new Personatges("Calamity Janet", null, 4);
@@ -523,7 +523,6 @@ public class Bang {
         System.out.println("COMENÇA EL JOC");
         DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
         IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
-        IPartidaDAO pDAO = (IPartidaDAO) daoFactory.create("partida");
 
         List<Jugadors> jList = jDAO.getNumJugadors(numJugadors);
         boolean acabarPartida = false;
@@ -536,6 +535,7 @@ public class Bang {
                     break;
                 }
                 else if(j.getPersonatgeDelJugador().getBales() <= 0) {
+                    CalcularDistancia(numJugadors);
                     if(j.getRolJugador().getNomRol() == Rol.RENEGAT || j.getRolJugador().getNomRol() == Rol.MALFACTOR)
                         dolentsMorts++;
                     else
@@ -554,7 +554,7 @@ public class Bang {
                             acabarPartida = true;
                         break;
                 }
-                if (j.getPersonatgeDelJugador().getBales() > 0){
+                if (j.getPersonatgeDelJugador().getBales() > 0) {
                     System.out.println("El torn és del jugador " + j.getNom() + ".");
                     AgafarCarta(j);
                     AgafarCarta(j);
@@ -571,6 +571,50 @@ public class Bang {
             }
         }
         FinalPartida(numJugadors);
+    }
+
+    public static void CalcularDistancia(int numJugadors) {
+
+        DAOFactory daoFactory = DAOFactoryImpl.getFactory("MySQL");
+
+        IJugadorDAO jDAO = (IJugadorDAO) daoFactory.create("jugador");
+        IJugadorsRivalsDAO jrDAO = (IJugadorsRivalsDAO) daoFactory.create("jugadorRival");
+
+        //Calculem la distància entre enemics i creem els enemics rivals
+        List<Jugadors> jugadorsList = jDAO.getNumJugadorsAmbVida(numJugadors);
+        Set<JugadorsRivals> enemics = new HashSet<>();
+        int a = 0;
+        for(Jugadors j : jugadorsList) {
+            for(Jugadors k : jugadorsList) {
+                if(!j.equals(k)) {
+                    JugadorRivalsId aux = new JugadorRivalsId(k, j);
+                    if(a > 0) {
+                        for (JugadorsRivals jr : enemics) {
+                            if (!(jr.getIdRival().getIdJugador().getIdJugador() == k.getIdJugador() && jr.getIdRival().getIdRival().getIdJugador() == j.getIdJugador())) {
+                                if (Math.abs(j.getPosicio() - k.getPosicio()) < jugadorsList.size()/2) {
+                                    enemics.add(new JugadorsRivals(aux, Math.abs(j.getPosicio() - k.getPosicio())));
+                                } else {
+                                    enemics.add(new JugadorsRivals(aux, jugadorsList.size() - Math.abs(j.getPosicio() - k.getPosicio())));
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        if (Math.abs(j.getPosicio() - k.getPosicio()) < jugadorsList.size()/2) {
+                            enemics.add(new JugadorsRivals(aux, Math.abs(j.getPosicio() - k.getPosicio())));
+                        } else {
+                            enemics.add(new JugadorsRivals(aux, jugadorsList.size() - Math.abs(j.getPosicio() - k.getPosicio())));
+                        }
+                    }
+                }
+            }
+            j.setJugadorsRivals(enemics);
+            a++;
+        }
+        for(JugadorsRivals jr : enemics) {
+            jrDAO.update(jr);
+        }
     }
 
     public static void AgafarCarta(Jugadors j) {
@@ -813,7 +857,7 @@ public class Bang {
         }
 
         //drop taula jugadors rivals per poder fer més d'una partida
-
+        jrDAO.borrarTots();
     }
 
     public static void TornarAJugar(int jugadors) {

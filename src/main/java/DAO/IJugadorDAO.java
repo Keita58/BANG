@@ -13,4 +13,5 @@ public interface IJugadorDAO extends IGenericDAO<Jugadors, Integer>, Serializabl
     List<Jugadors> RetornarJugadorsOrdenats();
     List<Jugadors> getJugadorsRolsVida(Rol rol);
     List<Jugadors> getNumJugadors(int numJugadors);
+    List<Jugadors> getNumJugadorsAmbVida(int numJugadors);
 }
