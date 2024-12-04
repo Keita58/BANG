@@ -588,7 +588,8 @@ public class Bang {
                 if(jAmbVida.size() > 1){
                     if(jAmbVida.size() == 2) {
                         // Si hi ha dos jugadors vius i són el xèrif i l'ajudant s'acaba el joc
-                        if((jAmbVida.get(0).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(0).getRolJugador().getNomRol() == Rol.AJUDANT) && (jAmbVida.get(1).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(1).getRolJugador().getNomRol() == Rol.AJUDANT)) {
+                        if((jAmbVida.get(0).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(0).getRolJugador().getNomRol() == Rol.AJUDANT) &&
+                                (jAmbVida.get(1).getRolJugador().getNomRol() == Rol.XERIF || jAmbVida.get(1).getRolJugador().getNomRol() == Rol.AJUDANT)) {
                             acabarPartida = true;
                             break;
                         }
@@ -852,6 +853,7 @@ public class Bang {
                                     if(j.getArmaJugador().getDistanciaArma() >= jr.getDistanciaRival()) {
                                         // El contrincant perd una vida.
                                         jr.getIdRival().getIdRival().getPersonatgeDelJugador().setBales(jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() - 1);
+                                        jDAO.update(jr.getIdRival().getIdRival());
                                         System.out.println("Ha jugat un BANG! contra el jugador " +  jr.getIdRival().getIdRival().getPersonatgeDelJugador().getNom() + "! Quina mala baba.");
                                         System.out.println("L'enemic ara té " +  jr.getIdRival().getIdRival().getPersonatgeDelJugador().getBales() + " vides.");
                                         Set<Cartes> cartesEnemic = jr.getIdRival().getIdRival().getCartes();
@@ -877,7 +879,6 @@ public class Bang {
                                 }
                                 break;
                             }
-                            jrDAO.update(jr);
                         }
                         if(acabat)
                             break;
@@ -962,14 +963,12 @@ public class Bang {
         IJugadorDAO jDao = (IJugadorDAO) daoFactory.create("jugador");
 
         Partides partida = partDAO.getPartidaFinal();
-        List<Jugadors> jList = jDao.getNumJugadors(numJugadors);
+        List<Jugadors> jList = jDao.getNumJugadorsAmbVida(numJugadors);
 
         for (Jugadors j : jList) {
-            if (j.getPersonatgeDelJugador() != null && j.getPersonatgeDelJugador().getBales() > 0) {
-                j.setGuanyats(j.getGuanyats()+1);
-                System.out.println("Ha guanyat: "+j.getNom()+" amb el rol: "+j.getRolJugador().getNomRol()+"!!");
-                jDao.update(j);
-            }
+            j.setGuanyats(j.getGuanyats()+1);
+            System.out.println("Ha guanyat: "+j.getNom()+" amb el rol: "+j.getRolJugador().getNomRol()+"!!");
+            jDao.update(j);
         }
 
         if(partida != null) {
